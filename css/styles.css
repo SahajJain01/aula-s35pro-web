@@ -174,15 +174,17 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .progress i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
 
 /* ---------- buttons page ---------- */
-.buttons-layout { display: grid; grid-template-columns: 300px 1fr; gap: 16px; align-items: start; }
-.mouse-figure { display: grid; place-items: center; padding: 8px 0; }
+/* Both cards stretch to the same height; the figure and the list centre within them. */
+.buttons-layout { display: grid; grid-template-columns: 300px 1fr; gap: 16px; align-items: stretch; }
+.buttons-layout > .card:first-child { display: grid; place-items: center; }
+.mouse-figure { display: grid; place-items: center; padding: 8px 0; width: 100%; }
 .mouse-figure svg { width: 100%; max-width: 260px; height: auto; }
 .mouse-figure .body { fill: var(--surface-2); stroke: var(--border); stroke-width: 2; }
 .mouse-figure .part { fill: var(--surface); stroke: var(--border); stroke-width: 2; cursor: pointer; transition: fill .15s; }
 .mouse-figure .part:hover, .mouse-figure .part.hl { fill: var(--accent-soft); stroke: var(--accent); }
 .mouse-figure .part.pressed { fill: var(--accent); stroke: var(--accent); }
 .mouse-figure .tag { fill: var(--muted); font-size: 12px; font-weight: 600; pointer-events: none; }
-.bind-list { display: grid; gap: 0; padding: 6px 12px 6px 18px; }
+.bind-list { display: grid; gap: 0; padding: 6px 12px 6px 18px; align-content: center; }
 .bind { display: grid; grid-template-columns: 1fr 30px; align-items: center; gap: 6px; border-top: 1px solid var(--border); }
 .bind:first-child { border-top: 0; }
 .bind-main {
