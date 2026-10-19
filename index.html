@@ -3,8 +3,55 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AULA S350 PRO Control</title>
-  <meta name="description" content="Configure the AULA S350 PRO gaming mouse from your browser: buttons, DPI, lighting, macros and performance.">
+  <title>AULA S35 PRO Driver Online – DPI, RGB &amp; Macros (Unofficial)</title>
+  <meta name="description" content="Set up the AULA S35 PRO gaming mouse in your browser, no download needed. Change DPI, polling rate, buttons, macros and RGB lighting over the 2.4G receiver or USB cable.">
+  <meta name="keywords" content="AULA S35 PRO driver, AULA S35 PRO software, AULA S35 PRO macro, AULA S350 PRO driver, AULA-S350PRO, AULA mouse driver, 狼蛛 S35 PRO 驱动, WebHID mouse software">
+  <link rel="canonical" href="https://sahajjain01.github.io/aula-s35pro-web/">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#5b6cff">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AULA S35 PRO Web Driver">
+  <meta property="og:title" content="AULA S35 PRO Driver Online – no download needed">
+  <meta property="og:description" content="Change DPI, polling rate, buttons, macros and RGB lighting of the AULA S35 PRO right in Chrome or Edge.">
+  <meta property="og:url" content="https://sahajjain01.github.io/aula-s35pro-web/">
+  <meta property="og:image" content="https://sahajjain01.github.io/aula-s35pro-web/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AULA S35 PRO Driver Online – no download needed">
+  <meta name="twitter:description" content="Change DPI, polling rate, buttons, macros and RGB lighting of the AULA S35 PRO right in Chrome or Edge.">
+  <meta name="twitter:image" content="https://sahajjain01.github.io/aula-s35pro-web/og-image.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "AULA S35 PRO Web Driver",
+        "alternateName": ["AULA S35 PRO software", "AULA S350 PRO driver", "狼蛛 S35 PRO 驱动"],
+        "url": "https://sahajjain01.github.io/aula-s35pro-web/",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Windows, macOS, Linux, ChromeOS (Chrome, Edge or Opera)",
+        "description": "Unofficial browser-based configuration tool for the AULA S35 PRO gaming mouse: DPI stages, polling rate, button remapping, macros, RGB lighting and power settings.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "image": "https://sahajjain01.github.io/aula-s35pro-web/og-image.png"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "Where can I download the AULA S35 PRO driver?",
+            "acceptedAnswer": { "@type": "Answer", "text": "You don't need to download anything. Open this page in Chrome, Edge or Opera, plug in the mouse or its 2.4G receiver, click Connect mouse and change your settings. They are saved on the mouse itself." } },
+          { "@type": "Question", "name": "Which browsers and operating systems work?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Any desktop browser with WebHID: Chrome, Edge or Opera on Windows, macOS, Linux or ChromeOS. Firefox and Safari don't support WebHID." } },
+          { "@type": "Question", "name": "Is this the official AULA software?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. It is an independent, open-source tool that speaks the same protocol as the official Windows driver. It is not affiliated with AULA." } },
+          { "@type": "Question", "name": "Do my settings stay after I close the page?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every change is written to the mouse's own memory, so it keeps working on any computer without this page or any driver." } }
+        ]
+      }
+    ]
+  }
+  </script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='7' y='2' width='18' height='28' rx='9' fill='%235b6cff'/%3E%3Crect x='15' y='6' width='2' height='7' rx='1' fill='white'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +63,7 @@
     <div class="brand">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="7" y="2" width="18" height="28" rx="9" /><rect class="wheel" x="15" y="6" width="2" height="7" rx="1" /></svg>
       <div>
-        <div class="brand-name">AULA S350 PRO</div>
+        <div class="brand-name">AULA S35 PRO</div>
         <div class="brand-sub" id="device-sub">Not connected</div>
       </div>
     </div>
@@ -28,6 +75,51 @@
   </header>
 
   <main id="app"></main>
+
+  <section class="about" id="about">
+    <h2>AULA S35 PRO driver, without the download</h2>
+    <p>This page replaces the AULA S35 PRO Windows software (the official installer is named “AULA-S350PRO”).
+      It talks to the mouse directly from your browser (WebHID), so there's nothing to install, and every setting is
+      saved on the mouse itself.</p>
+    <ul class="about-list">
+      <li><b>DPI</b> – up to 8 stages from 100 to 12000 DPI, each with its own colour.</li>
+      <li><b>Polling rate</b> – 125, 250, 500 or 1000 Hz, plus debounce time.</li>
+      <li><b>Buttons</b> – remap all 6 buttons and the scroll wheel: keys, key combos, media keys, DPI and profile switching, double click, rapid fire.</li>
+      <li><b>Macros</b> – record keystrokes, clicks and scrolls with timing.</li>
+      <li><b>RGB lighting</b> – all 9 effects with brightness, speed, direction and colours.</li>
+      <li><b>Power and sensor</b> – sleep timers, wake on movement, angle snapping, ripple control and motion smoothing.</li>
+      <li><b>3 profiles</b> – Office, Game I and Game II, with backup and restore.</li>
+    </ul>
+
+    <h2>Frequently asked questions</h2>
+    <details>
+      <summary>Where can I download the AULA S35 PRO driver?</summary>
+      <p>You don't need to. Open this page in Chrome, Edge or Opera, plug in the mouse (USB cable or 2.4G receiver),
+        click <b>Connect mouse</b> and choose “2.4G Gaming Mouse” or “USB Gaming Mouse”.</p>
+    </details>
+    <details>
+      <summary>Which browsers and operating systems work?</summary>
+      <p>Any desktop browser with WebHID: Chrome, Edge or Opera on Windows, macOS, Linux or ChromeOS.
+        Firefox and Safari don't support it.</p>
+    </details>
+    <details>
+      <summary>The mouse doesn't show up or won't connect.</summary>
+      <p>Close the official AULA software first. On the 2.4G receiver, click a mouse button to wake it, then connect again.
+        On Linux you may need a udev rule that gives your user access to hidraw devices.</p>
+    </details>
+    <details>
+      <summary>Do my settings stay after I close the page?</summary>
+      <p>Yes. Changes are written to the mouse's memory, so they work on any computer without this page.</p>
+    </details>
+    <details>
+      <summary>Is this official AULA software?</summary>
+      <p>No. It's an independent, <a href="https://github.com/SahajJain01/aula-s35pro-web">open-source</a> tool that uses the
+        same protocol as the official Windows driver. It is not affiliated with or endorsed by AULA.</p>
+    </details>
+
+    <p class="about-zh" lang="zh-CN">狼蛛 AULA S35 PRO 鼠标驱动网页版：无需下载安装，在 Chrome / Edge 浏览器中直接设置 DPI、回报率、按键、宏和 RGB 灯光，设置保存在鼠标中。</p>
+    <p class="about-foot">Unofficial project · <a href="https://github.com/SahajJain01/aula-s35pro-web">Source on GitHub</a></p>
+  </section>
 
   <div class="toast-host" id="toasts" aria-live="polite"></div>
   <div class="modal-host" id="modal"></div>

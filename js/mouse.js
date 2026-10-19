@@ -28,6 +28,9 @@ export const BUTTONS = [
   { slot: 5, label: 'DPI button' },
 ];
 export const WHEEL = [{ idx: 0, label: 'Scroll up' }, { idx: 1, label: 'Scroll down' }];
+// Factory bindings, indexed by hardware slot / wheel index.
+export const DEFAULT_KEYS = [[1, 1, 0, 0], [1, 4, 0, 0], [1, 2, 0, 0], [1, 8, 0, 0], [1, 0x10, 0, 0], [8, 3, 0, 0]];
+export const DEFAULT_WHEEL = [[5, 0x01, 0, 0], [5, 0x81, 0, 0]];
 export const PROFILES = ['Office', 'Game I', 'Game II'];
 
 const u16 = (b, o) => b[o] | (b[o + 1] << 8);
@@ -218,12 +221,14 @@ export class Mouse {
   async setMoveWake(on) { await this.t.write(CMD.INPUT, 6, 0, [on ? 1 : 0]); this.state.global.moveWake = on ? 1 : 0; }
 
   // ---------- defaults / backup ----------
+  async resetButtons() {
+    for (let s = 0; s < DEFAULT_KEYS.length; s++) await this.setKey(s, DEFAULT_KEYS[s]);
+    for (let i = 0; i < DEFAULT_WHEEL.length; i++) await this.setWheel(i, DEFAULT_WHEEL[i]);
+  }
+
   async resetProfile() {
     const p = this.state.p;
-    const defaults = [[1, 1, 0, 0], [1, 4, 0, 0], [1, 2, 0, 0], [1, 8, 0, 0], [1, 0x10, 0, 0], [8, 3, 0, 0]];
-    for (let s = 0; s < 6; s++) await this.setKey(s, defaults[s]);
-    await this.setWheel(0, [5, 0x01, 0, 0]);
-    await this.setWheel(1, [5, 0x81, 0, 0]);
+    await this.resetButtons();
     const reset = CHIP_RESET[this.state.info.chip] || CHIP_RESET[8];
     Object.assign(p.dpi, { enabled: DEFAULTS.dpiEnabled.map(Boolean), current: 0, values: [...reset], colors: [...DEFAULTS.dpiColors] });
     await this.writeDpi();

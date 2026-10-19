@@ -1,7 +1,9 @@
-# AULA S350 PRO configuration protocol
+# AULA S35 PRO configuration protocol
+
+The official Windows driver for this mouse ships as “狼蛛AULA-S350PRO”; the mouse itself is sold as the S35 PRO.
 
 Recovered from the vendor driver `狼蛛AULA-S350PRO.exe` (PDB name *YXT Mouse Demo*, SHA-256
-`71e51971…63ec`) with REA/Ghidra, then confirmed against a live S350 PRO (2.4 GHz receiver,
+`71e51971…63ec`) with REA/Ghidra, then confirmed against a live S35 PRO (2.4 GHz receiver,
 mouse firmware 2.3.0007, receiver 2.3.0004, sensor PAW3311).
 
 Addresses below are functions in that executable.
@@ -52,7 +54,7 @@ increasing `ADDR`.
 | — | `F1` | sub 1 | receiver firmware version |
 
 Profile-specific data (rate, DPI, buttons, wheel, lighting, macros) always refers to the **active** profile;
-switch with `02/sub 2` first. Hardware button slots on the S350 PRO: 0 left, 1 wheel click, 2 right, 3 back,
+switch with `02/sub 2` first. Hardware button slots on the S35 PRO: 0 left, 1 wheel click, 2 right, 3 back,
 4 forward, 5 DPI (slot 6 = hidden LED button).
 
 ### DPI

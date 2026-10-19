@@ -104,10 +104,10 @@ export class HidTransport {
   write(cmd, sub = 0, addr = 0, data = []) { return this.queue.run(() => this.rawWrite(cmd, sub, addr, data)); }
 }
 
-// In-memory device used by demo mode. Seeded from a real S350 PRO dump.
+// In-memory device used by demo mode. Seeded from a real S35 PRO dump.
 export class MockTransport {
   constructor() {
-    this.name = 'AULA S350 PRO (demo)';
+    this.name = 'AULA S35 PRO (demo)';
     this.productId = 0x4091;
     this.demo = true;
     const hex = (s) => Uint8Array.from(s.trim().split(/\s+/).map((x) => parseInt(x, 16)));

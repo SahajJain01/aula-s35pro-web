@@ -1,5 +1,5 @@
 import { HidTransport, MockTransport } from './hid.js';
-import { Mouse, BUTTONS, WHEEL, PROFILES } from './mouse.js';
+import { Mouse, BUTTONS, WHEEL, PROFILES, DEFAULT_KEYS, DEFAULT_WHEEL } from './mouse.js';
 import { LED_MODES } from './data.js';
 import * as C from './codec.js';
 
@@ -65,6 +65,7 @@ const later = (key, fn, ms = 300) => { clearTimeout(timers[key]); timers[key] = 
 
 // ---------- connection ----------
 function renderConnect({ error, loading } = {}) {
+  $('#about').hidden = false;
   $('#profiles').hidden = true;
   $('#btn-disconnect').hidden = true;
   $('#device-sub').textContent = 'Not connected';
@@ -73,8 +74,8 @@ function renderConnect({ error, loading } = {}) {
   const blocked = supported && document.featurePolicy && !document.featurePolicy.allowsFeature('hid');
   root.replaceChildren(h('section', { class: 'connect' },
     h('div', { class: 'hero', html: heroSvg() }),
-    h('h1', null, 'Configure your mouse'),
-    h('p', null, 'Plug in your AULA S350 PRO (USB cable or the 2.4 GHz receiver) and connect. Every change is written straight to the mouse, so it works on any computer afterwards.'),
+    h('h1', null, 'Set up your AULA S35 PRO'),
+    h('p', null, 'Plug in your AULA S35 PRO (USB cable or the 2.4 GHz receiver) and connect. Every change is written straight to the mouse, so it works on any computer afterwards.'),
     loading ? h('div', { class: 'progress' }, h('i', { id: 'load-bar' })) : null,
     loading ? h('p', { id: 'load-text' }, 'Reading settings…') : null,
     !loading && h('div', { class: 'actions' },
@@ -158,6 +159,7 @@ function onInputReport(id, d) {
 
 // ---------- shell ----------
 function renderShell() {
+  $('#about').hidden = true;
   const s = S();
   const t = app.mouse.t;
   $('#device-sub').textContent = [s.info.model.link, s.info.firmware && 'FW ' + s.info.firmware, t.demo && 'Demo'].filter(Boolean).join(' · ');
@@ -270,22 +272,41 @@ function highlightPressed() {
   document.querySelectorAll('[data-slot]').forEach((el) => el.classList.toggle('pressed', !!(app.live.pressed & (1 << +el.dataset.slot))));
 }
 
+const sameBinding = (a, b) => a.every((v, i) => v === b[i]);
+const RESET_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>';
+
+async function resetButton(slot) {
+  if (!leftClickGuard(slot, DEFAULT_KEYS[slot])) return false;
+  await app.mouse.setKey(slot, DEFAULT_KEYS[slot]);
+  return true;
+}
+
 function pageButtons() {
   const p = S().p;
-  const row = (num, name, bytes, onclick, slot) => {
+  const row = ({ num, name, bytes, def, open, reset, slot }) => {
     const info = bindingInfo(bytes);
-    return h('button', { class: 'bind', 'data-slot': slot, onclick,
-      onmouseenter: () => slot != null && document.querySelectorAll(`[data-slot="${slot}"]`).forEach((x) => x.classList.add('hl')),
-      onmouseleave: () => slot != null && document.querySelectorAll(`[data-slot="${slot}"]`).forEach((x) => x.classList.remove('hl')) },
-      h('span', { class: 'num' }, num), h('span', { class: 'bind-name' }, name),
-      h('span', { class: 'bind-value' }, info.label, info.kind === 'macro' && info.mode ? h('small', null, C.MACRO_MODES[info.mode]?.label || '') : null),
-      h('span', { class: 'chev' }, '›'));
+    const changed = !sameBinding(bytes, def);
+    const hl = (on) => slot != null && document.querySelectorAll(`[data-slot="${slot}"]`).forEach((x) => x.classList.toggle('hl', on));
+    return h('div', { class: 'bind', 'data-slot': slot, onmouseenter: () => hl(true), onmouseleave: () => hl(false) },
+      h('button', { class: 'bind-main', onclick: open },
+        h('span', { class: 'num' }, num), h('span', { class: 'bind-name' }, name),
+        h('span', { class: 'bind-value' }, info.label, info.kind === 'macro' && info.mode ? h('small', null, C.MACRO_MODES[info.mode]?.label || '') : null),
+        h('span', { class: 'chev' }, '›')),
+      h('button', { class: 'icon-btn bind-reset', title: `Reset to ${bindingInfo(def).label}`, 'aria-label': `Reset ${name} to ${bindingInfo(def).label}`,
+        disabled: !changed, html: RESET_ICON, onclick: () => save(async () => { if (await reset()) { renderPage(); toast(`${name} reset`); } }) }));
   };
+  const allDefault = BUTTONS.every((b) => sameBinding(p.keys[b.slot], DEFAULT_KEYS[b.slot])) && WHEEL.every((w) => sameBinding(p.wheel[w.idx], DEFAULT_WHEEL[w.idx]));
   const list = h('div', { class: 'card bind-list' },
-    BUTTONS.map((b, i) => row(i + 1, b.label, p.keys[b.slot], () => pickForButton(b.slot), b.slot)),
-    WHEEL.map((w) => row('⇕', w.label, p.wheel[w.idx], () => pickForWheel(w.idx))));
+    BUTTONS.map((b, i) => row({ num: i + 1, name: b.label, bytes: p.keys[b.slot], def: DEFAULT_KEYS[b.slot], slot: b.slot,
+      open: () => pickForButton(b.slot), reset: () => resetButton(b.slot) })),
+    WHEEL.map((w) => row({ num: '⇕', name: w.label, bytes: p.wheel[w.idx], def: DEFAULT_WHEEL[w.idx],
+      open: () => pickForWheel(w.idx), reset: async () => { await app.mouse.setWheel(w.idx, DEFAULT_WHEEL[w.idx]); return true; } })));
+  const resetAll = h('button', { class: 'btn', disabled: allDefault, onclick: () => {
+    if (!confirm('Reset all buttons and the scroll wheel to their factory functions?')) return;
+    save(async () => { await app.mouse.resetButtons(); renderPage(); toast('All buttons reset'); });
+  }, html: RESET_ICON + '<span>Reset all buttons</span>' });
   const page = [
-    head('Buttons', 'Click a button to change what it does. Press a physical button to see it light up.'),
+    head('Buttons', 'Click a button to change what it does. Press a physical button to see it light up.', resetAll),
     h('div', { class: 'buttons-layout' }, h('div', { class: 'card' }, mouseFigure()), list),
   ];
   queueMicrotask(highlightPressed);
@@ -304,7 +325,7 @@ function leftClickGuard(slot, bytes) {
 function pickForButton(slot) {
   const b = BUTTONS.find((x) => x.slot === slot);
   openPicker({
-    title: b.label, current: S().p.keys[slot], allowMacros: true,
+    title: b.label, current: S().p.keys[slot], def: DEFAULT_KEYS[slot], allowMacros: true,
     apply: async (choice) => {
       if (choice.bytes) {
         if (!leftClickGuard(slot, choice.bytes)) return false;
@@ -320,7 +341,7 @@ function pickForButton(slot) {
 
 function pickForWheel(idx) {
   openPicker({
-    title: WHEEL[idx].label, current: S().p.wheel[idx], allowMacros: false,
+    title: WHEEL[idx].label, current: S().p.wheel[idx], def: DEFAULT_WHEEL[idx], allowMacros: false,
     apply: async (choice) => { if (!choice.bytes) return false; await app.mouse.setWheel(idx, choice.bytes); return true; },
   });
 }
@@ -328,7 +349,7 @@ function pickForWheel(idx) {
 function closeModal() { $('#modal').replaceChildren(); document.removeEventListener('keydown', escClose); }
 function escClose(e) { if (e.key === 'Escape' && !e.defaultPrevented) closeModal(); }
 
-function openPicker({ title, current, allowMacros, apply }) {
+function openPicker({ title, current, def, allowMacros, apply }) {
   const info = bindingInfo(current);
   const cats = ['Mouse', 'Keyboard', ...(allowMacros ? ['Shortcuts', 'Macro'] : []), 'Media', 'DPI', 'Profile', 'Scroll', 'Lighting', 'Other'];
   let cat = cats.includes(info.group) ? info.group : 'Mouse';
@@ -366,7 +387,11 @@ function openPicker({ title, current, allowMacros, apply }) {
     h('div', { class: 'modal-head' }, h('h3', null, title), h('span', { style: { color: 'var(--muted)' } }, 'Now: ' + info.label),
       h('button', { class: 'icon-btn', 'aria-label': 'Close', onclick: closeModal }, '✕')),
     h('div', { class: 'modal-body' }, catList, body),
-    h('div', { class: 'modal-foot' }, h('button', { class: 'btn', onclick: closeModal }, 'Cancel'), applyBtn)));
+    h('div', { class: 'modal-foot' },
+      def && !sameBinding(current, def)
+        ? h('button', { class: 'btn ghost', style: { marginRight: 'auto' }, onclick: () => commit({ bytes: def }), html: RESET_ICON + `<span>Reset to ${bindingInfo(def).label}</span>` })
+        : null,
+      h('button', { class: 'btn', onclick: closeModal }, 'Cancel'), applyBtn)));
   $('#modal').onclick = (e) => { if (e.target.id === 'modal') closeModal(); };
   document.addEventListener('keydown', escClose);
 }
@@ -697,7 +722,7 @@ function pagePerformance() {
 function pageDevice() {
   const s = S(), i = s.info, chip = app.mouse.chip;
   const items = [
-    ['Model', 'AULA S350 PRO'], ['Connection', i.model.link], ['Firmware', i.firmware || '—'],
+    ['Model', 'AULA S35 PRO'], ['Connection', i.model.link], ['Firmware', i.firmware || '—'],
     i.receiver ? ['Receiver firmware', i.receiver] : null, ['Build', i.build || '—'], ['Sensor', chip.sensor],
     i.model.link !== 'Wired' && i.battery <= 100 ? ['Battery', i.battery + '%'] : null,
     s.global.chargeCount ? ['Charge cycles', s.global.chargeCount] : null,
@@ -706,7 +731,7 @@ function pageDevice() {
 
   const exportCfg = () => {
     const blob = new Blob([JSON.stringify(app.mouse.exportProfile(), null, 2)], { type: 'application/json' });
-    const a = h('a', { href: URL.createObjectURL(blob), download: `aula-s350pro-${PROFILES[s.profile].replace(/\s/g, '').toLowerCase()}.json` });
+    const a = h('a', { href: URL.createObjectURL(blob), download: `aula-s35pro-${PROFILES[s.profile].replace(/\s/g, '').toLowerCase()}.json` });
     a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
   const importCfg = h('input', { type: 'file', accept: 'application/json,.json', hidden: true, onchange: async (e) => {
